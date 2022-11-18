@@ -1,5 +1,6 @@
 const express = require('express')
 const User = require('../models/user');
+const auth = require('../middleware/auth');
 const router = new express.Router()
 
 
@@ -25,15 +26,11 @@ router.post('/users/login', async (req, res) => {
     }
 });
 
-router.get('/users', (req, res) => {
-    User.find({}).then((users) => {
-        res.send(users)
-    }).catch((error) => {
-        res.status(500).send()
-    })
+router.get('/users/me', auth, (req, res) => {
+    res.send(req.user)
 });
 
-router.get('/users/:id', (req, res) => {
+router.get('/users/:id', auth, (req, res) => {
     const _id = req.params.id
 
     User.findById(_id).then((user) => {
@@ -47,7 +44,7 @@ router.get('/users/:id', (req, res) => {
     })
 });
 
-router.delete('/users/:id', (req, res) => {
+router.delete('/users/:id', auth, (req, res) => {
     const _id = req.params.id
 
     User.findByIdAndDelete(_id).then((user) => {
